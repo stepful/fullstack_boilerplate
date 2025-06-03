@@ -19,15 +19,26 @@ server.get("/users", (_request, reply) => {
 });
 
 server.get("/quizzes", (_request, reply) => {
-	const data = db.prepare("SELECT * FROM quizzes").all();
+	const data = db.prepare("SELECT * FROM assignments").all();
 
 	return data;
 });
 
 server.get("/quizzes/:id", (request, reply) => {
-	const data = db.prepare("SELECT * FROM quizzes WHERE id = :id");
-
-	return data.get(request.params);
+	try {
+		const query = `
+		SELECT a.title, a.id, a.created_at, q.question_content, q.choices
+		FROM assignments a
+		INNER JOIN assignment_questions q ON a.id = q.assignment_id
+		WHERE a.id = :id;
+	`;
+		const data = db.prepare(query);
+		console.log(data.all(request.params));
+		return data.all(request.params);
+	}
+	catch (error) {
+		console.error("Error fetching quiz:", error);
+	}
 });
 
 server.listen({ port: PORT }, (err) => {

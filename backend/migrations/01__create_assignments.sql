@@ -5,7 +5,7 @@ CREATE TABLE
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
-CREATE TABLE
+-- CREATE TABLE
   assignment_questions (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     assignment_id INTEGER NOT NULL REFERENCES assignments (id),

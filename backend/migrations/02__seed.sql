@@ -7,7 +7,7 @@ VALUES
   ('Alice Johnson', 'alice@example.com'),
   ('Bob Brown', 'bob@example.com');
 
--- Create test assignments
+Create test assignments
 INSERT INTO
   assignments (title)
 VALUES
@@ -15,9 +15,9 @@ VALUES
   ('Cardiovascular System Basics'),
   ('Digestive System Overview');
 
--- Create questions for Skeletal System Quiz
+Create questions for Skeletal System Quiz
 INSERT INTO
-  assignment_questions (assignment_id, title, choices)
+  assignment_questions (assignment_id,  question_content, choices)
 SELECT
   (
     SELECT
@@ -27,36 +27,22 @@ SELECT
     WHERE
       title = 'Basic Skeletal System Quiz'
   ),
-  title,
+  question_content,
   choices
-FROM
-  (
-    VALUES
-      (
-        'Which bone is the longest in the human body?',
-        'Femur;;Tibia;;Humerus;;Fibula'
-      ),
-      (
-        'How many bones are in the adult human body?',
-        '206;;186;;226;;196'
-      ),
-      (
-        'Which part of the skull protects the brain?',
-        'Cranium;;Mandible;;Maxilla;;Hyoid'
-      ),
-      (
-        'What is the common name for the clavicle?',
-        'Collarbone;;Wishbone;;Shoulderblade;;Neckbone'
-      ),
-      (
-        'Explain the difference between compact and spongy bone tissue:',
-        NULL
-      )
-  ) AS q (title, choices);
-
--- Create questions for Cardiovascular Quiz
+FROM (
+  SELECT 'Which bone is the longest in the human body?' AS  question_content, 'Femur;;Tibia;;Humerus;;Fibula' AS choices
+  UNION ALL
+  SELECT 'How many bones are in the adult human body?', '206;;186;;226;;196'
+  UNION ALL
+  SELECT 'Which part of the skull protects the brain?', 'Cranium;;Mandible;;Maxilla;;Hyoid'
+  UNION ALL
+  SELECT 'What is the common name for the clavicle?', 'Collarbone;;Wishbone;;Shoulderblade;;Neckbone'
+  UNION ALL
+  SELECT 'Explain the difference between compact and spongy bone tissue:', NULL
+);
+-- -- Create questions for Cardiovascular Quiz
 INSERT INTO
-  assignment_questions (assignment_id, title, choices)
+  assignment_questions (assignment_id, question_content, choices)
 SELECT
   (
     SELECT
@@ -66,36 +52,46 @@ SELECT
     WHERE
       title = 'Cardiovascular System Basics'
   ),
-  title,
+  question_content,
   choices
 FROM
   (
-    VALUES
-      (
-        'Which chamber of the heart pumps blood to the body?',
-        'Left ventricle;;Right ventricle;;Left atrium;;Right atrium'
-      ),
-      (
-        'What is the main function of red blood cells?',
-        'Carry oxygen;;Fight infection;;Form blood clots;;Produce antibodies'
-      ),
-      (
-        'Which blood vessel carries oxygenated blood?',
-        'Arteries;;Veins;;Capillaries;;Venules'
-      ),
-      (
-        'How many chambers are in the human heart?',
-        '4;;2;;3;;6'
-      ),
-      (
-        'Describe the path of blood flow through the heart:',
-        NULL
-      )
-  ) AS q (title, choices);
+    SELECT
+			'What is the main function of the cardiovascular system?' AS question_content,
+      'Pump blood;;Transport nutrients;;Regulate body temperature;;Filter waste' AS choices
+    UNION ALL
+      SELECT 'Which chamber of the heart pumps blood to the body?' AS question_content,
+			'Left ventricle;;Right ventricle;;Left atrium;;Right atrium' AS choices
+    UNION ALL
+      SELECT 'What is the primary function of the pulmonary circulation?' AS question_content,
+			'Pump blood to the lungs;;Pump blood to the body;;Pump blood to the liver;;Pump blood to the kidneys' AS choices
+    UNION ALL
+      SELECT 'Which valve prevents backflow of blood in the heart?' AS question_content,
+        'Left ventricle;;Right ventricle;;Left atrium;;Right atrium' AS choices
+    UNION ALL
+      SELECT 'What is the primary function of the pulmonary circulation?' AS question_content,
+        'Pump blood to the lungs;;Pump blood to the body;;Pump blood to the liver;;Pump blood to the kidneys' AS choices	
+			UNION ALL
+			SELECT 'Describe the path of blood flow through the heart:' AS question_content,
+				NULL AS choices
+			UNION ALL
+			SELECT 'What is the main function of red blood cells?' AS question_content,
+				'Carry oxygen;;Fight infection;;Form blood clots;;Produce antibodies' AS choices
+			UNION ALL
+			SELECT 'Which blood vessel carries oxygenated blood?' AS question_content,
+				'Arteries;;Veins;;Capillaries;;Venules' AS choices
+			UNION ALL
+			SELECT 'How many chambers are in the human heart?' AS question_content,
+				'4;;2;;3;;6' AS choices
+			UNION ALL
+			SELECT 'Describe the path of blood flow through the heart:' AS question_content,
+				NULL AS choices
+	);
+
 
 -- Create questions for Digestive System Quiz
 INSERT INTO
-  assignment_questions (assignment_id, title, choices)
+  assignment_questions (assignment_id, question_content, choices)
 SELECT
   (
     SELECT
@@ -105,29 +101,22 @@ SELECT
     WHERE
       title = 'Digestive System Overview'
   ),
-  title,
+  question_content,
   choices
 FROM
   (
-    VALUES
-      (
-        'Where does chemical digestion begin?',
-        'Mouth;;Stomach;;Small intestine;;Esophagus'
-      ),
-      (
-        'Which organ produces bile?',
-        'Liver;;Pancreas;;Gallbladder;;Stomach'
-      ),
-      (
-        'What is the longest part of the digestive system?',
-        'Small intestine;;Large intestine;;Esophagus;;Stomach'
-      ),
-      (
-        'Which enzyme breaks down proteins in the stomach?',
-        'Pepsin;;Amylase;;Lipase;;Trypsin'
-      ),
-      (
-        'Explain the role of villi in the small intestine:',
-        NULL
-      )
-  ) AS q (title, choices);
+    SELECT 'Where does chemical digestion begin?' AS question_content,
+        'Mouth;;Stomach;;Small intestine;;Esophagus' AS choices
+    UNION ALL
+      SELECT'Which organ produces bile?' AS question_content,
+        'Liver;;Pancreas;;Gallbladder;;Stomach' AS choices
+		UNION ALL
+ 			SELECT'What is the longest part of the digestive system?' AS question_content,
+        'Small intestine;;Large intestine;;Esophagus;;Stomach' AS choices
+		UNION ALL
+			SELECT 'Which enzyme breaks down proteins in the stomach?' AS question_content,
+			'Pepsin;;Amylase;;Lipase;;Trypsin'  AS choices
+		UNION ALL
+      SELECT 'Explain the role of villi in the small intestine:' AS question_content,
+			NULL AS choices  
+  );
