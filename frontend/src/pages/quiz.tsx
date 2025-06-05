@@ -1,3 +1,5 @@
+import type { Question } from "@/components/question";
+import { QuizQuestionsList } from "@/components/question";
 import type { Quiz } from "@/components/quiz";
 import {
 	Card,
@@ -7,7 +9,7 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { quizApiUrl, rootPath } from "@/paths";
+import { quizApiUrl, quizQuestionApiUrl, rootPath } from "@/paths";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
@@ -16,11 +18,18 @@ export function QuizPage() {
 	if (!id) throw new Error("Quiz id param is required");
 
 	const [quiz, setQuiz] = useState<Quiz | null>(null);
+	const [questions, setQuestions] = useState<Question[] | null>(null);
 	const [error, setError] = useState<Error | null>(null);
 	useEffect(() => {
 		fetch(quizApiUrl({ id }))
 			.then((res) => res.json())
 			.then(setQuiz)
+			.catch(setError);
+	}, [id]);
+	useEffect(() => {
+		fetch(quizQuestionApiUrl({ id }))
+			.then((res) => res.json())
+			.then(setQuestions)
 			.catch(setError);
 	}, [id]);
 
@@ -32,15 +41,18 @@ export function QuizPage() {
 			</div>
 		);
 
-	if (!quiz) return <div className="text-center p-8">Loading...</div>;
-
+	if (!quiz || !questions)
+		return <div className="text-center p-8">Loading...</div>;
+	console.log(quiz, "QUIZ OBJ", questions);
 	return (
 		<Card className="w-[600px] mx-auto">
 			<CardHeader className="pb-8">
-				<CardTitle>Quiz #{quiz.id}</CardTitle>
+				<CardTitle>
+					Quiz #{quiz.id}: {quiz.title}
+				</CardTitle>
 				<CardDescription>Quiz details below...</CardDescription>
+				<QuizQuestionsList questions={questions} />
 			</CardHeader>
-			<CardContent>Quiz name: {quiz.name}</CardContent>
 			<CardFooter className="flex justify-between pt-8">
 				<Link
 					to={rootPath.pattern}
