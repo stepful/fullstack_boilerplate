@@ -1,4 +1,6 @@
-DROP TABLE assignments;
+DROP TABLE IF EXISTS scores;
+DROP TABLE IF EXISTS assignment_questions;
+DROP TABLE IF EXISTS assignments;
 CREATE TABLE
   assignments (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

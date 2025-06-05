@@ -16,28 +16,57 @@ VALUES
   ('Digestive System Overview');
 
 -- Create questions for Skeletal System Quiz
-INSERT INTO assignment_questions (assignment_id, title, choices)
+INSERT INTO assignment_questions (assignment_id, title, choices, answer)
 SELECT
   (SELECT id FROM assignments WHERE title = 'Basic Skeletal System Quiz'),
   'Which bone is the longest in the human body?',
-  'Femur;;Tibia;;Humerus;;Fibula'
+  'Femur;;Tibia;;Humerus;;Fibula',
+  'Humerus'
 UNION ALL
 SELECT
   (SELECT id FROM assignments WHERE title = 'Basic Skeletal System Quiz'),
   'How many bones are in the adult human body?',
-  '206;;186;;226;;196'
+  '206;;186;;226;;196',
+  '206'
 UNION ALL
 SELECT
   (SELECT id FROM assignments WHERE title = 'Basic Skeletal System Quiz'),
   'Which part of the skull protects the brain?',
-  'Cranium;;Mandible;;Maxilla;;Hyoid'
+  'Cranium;;Mandible;;Maxilla;;Hyoid',
+  'Mandible'
 UNION ALL
 SELECT
   (SELECT id FROM assignments WHERE title = 'Basic Skeletal System Quiz'),
   'What is the common name for the clavicle?',
-  'Collarbone;;Wishbone;;Shoulderblade;;Neckbone'
+  'Collarbone;;Wishbone;;Shoulderblade;;Neckbone',
+  'Collarbone'
 UNION ALL
 SELECT
   (SELECT id FROM assignments WHERE title = 'Basic Skeletal System Quiz'),
   'Explain the difference between compact and spongy bone tissue:',
-  NULL;
+  NULL,
+  'One is compact and the other is spongy';
+
+-- Insert scores for 'Basic Skeletal System Quiz'
+INSERT INTO scores (assignment_id, user_id, score)
+VALUES
+  (
+    (SELECT id FROM assignments WHERE title = 'Digestive System Overview'),
+    (SELECT id FROM users WHERE email = 'john@example.com'),
+    70
+  ),
+  (
+    (SELECT id FROM assignments WHERE title = 'Digestive System Overview'),
+    (SELECT id FROM users WHERE email = 'jane@example.com'),
+    75
+  ),
+  (
+    (SELECT id FROM assignments WHERE title = 'Digestive System Overview'),
+    (SELECT id FROM users WHERE email = 'alice@example.com'),
+    80
+  ),
+  (
+    (SELECT id FROM assignments WHERE title = 'Digestive System Overview'),
+    (SELECT id FROM users WHERE email = 'bob@example.com'),
+    100
+  );
