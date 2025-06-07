@@ -58,6 +58,8 @@ export type Question = {
 	id: number;
 	title: string;
 	choices: string | null;
+	answer: string | null;
+	points: number;
 };
 
 export function QuizQuestionsList({ questions }: { questions: Question[] }) {

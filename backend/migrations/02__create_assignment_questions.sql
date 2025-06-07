@@ -6,5 +6,6 @@ CREATE TABLE
     title TEXT NOT NULL,
     choices TEXT, -- sqlite doesn't support arrays, so we'll store choices as a string of ';;'-separated values
     answer TEXT,
+    points INTEGER,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
   );

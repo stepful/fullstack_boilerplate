@@ -32,7 +32,7 @@ server.get("/quizzes/:id", (request, reply) => {
 
 server.get("/quizzes/:id/questions", (request, reply) => {
 	const stmt = db.prepare(`
-		SELECT id, title, choices
+		SELECT id, title, choices, answer, points
 		FROM assignment_questions
 		WHERE assignment_id = :id
 	`);
