@@ -1,5 +1,5 @@
 import type { Question } from "@/components/question";
-import { QuizQuestionsList } from "@/components/question";
+import { QuizQuestionsList, QuizStepper } from "@/components/question";
 import type { Quiz } from "@/components/quiz";
 import {
 	Card,
@@ -43,7 +43,7 @@ export function QuizPage() {
 
 	if (!quiz || !questions)
 		return <div className="text-center p-8">Loading...</div>;
-	console.log(quiz, "QUIZ OBJ", questions);
+
 	return (
 		<Card className="w-[600px] mx-auto">
 			<CardHeader className="pb-8">
@@ -51,7 +51,8 @@ export function QuizPage() {
 					Quiz #{quiz.id}: {quiz.title}
 				</CardTitle>
 				<CardDescription>Quiz details below...</CardDescription>
-				<QuizQuestionsList questions={questions} />
+
+				<QuizStepper questions={questions} />
 			</CardHeader>
 			<CardFooter className="flex justify-between pt-8">
 				<Link
