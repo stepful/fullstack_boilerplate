@@ -60,6 +60,9 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [answers, setAnswers] = useState<Record<number, string>>({});
+	const [earnedPoints, setEarnedPoints] = useState(0);
+	const [totalPoints, setTotalPoints] = useState(0);
+	const [correctAnswers, setCorrectAnswers] = useState(0);
 	const [submitted, setSubmitted] = useState(false);
 	const [hasHydrated, setHasHydrated] = useState(false);
 	const currentQuestion = questions[currentIndex];
@@ -75,6 +78,9 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 				setCurrentIndex(parsed.currentIndex ?? 0);
 				setAnswers(parsed.answers ?? {});
 				setSubmitted(parsed.submitted ?? false);
+				setCorrectAnswers(parsed.correctAnswers ?? 0);
+				setEarnedPoints(parsed.earnedPoints ?? 0);
+				setTotalPoints(parsed.totalPoints ?? 0);
 				setHasHydrated(true);
 			} catch (err) {
 				console.error("Error parsing saved quiz progress", err);
@@ -90,9 +96,21 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 			currentIndex,
 			answers,
 			submitted,
+			earnedPoints,
+			totalPoints,
+			correctAnswers,
 		};
 		localStorage.setItem(quizKey, JSON.stringify(data));
-	}, [currentIndex, answers, submitted, quizKey, hasHydrated]);
+	}, [
+		currentIndex,
+		answers,
+		submitted,
+		quizKey,
+		hasHydrated,
+		earnedPoints,
+		totalPoints,
+		correctAnswers,
+	]);
 
 	const handleChoiceChange = (value: string) => {
 		setAnswers((prev) => ({
@@ -102,6 +120,20 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 	};
 
 	const handleSubmit = () => {
+		let points = 0;
+		let totalPoints = 0;
+		let correctAnswersCount = 0;
+		for (let i = 0; i < questions.length; i++) {
+			totalPoints += questions[i].points;
+			if (questions[i].answer === answers[questions[i].id]) {
+				points += questions[i].points;
+				correctAnswersCount++;
+			}
+		}
+		setEarnedPoints(points);
+		setTotalPoints(totalPoints);
+		setCorrectAnswers(correctAnswersCount);
+		console.log(answers, questions, "SUBMIT", points, totalPoints);
 		setSubmitted(true);
 	};
 
@@ -123,7 +155,7 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 							value={choice}
 							checked={selected === choice}
 							onChange={() => handleChoiceChange(choice)}
-							disabled={submitted}
+							disabled={false} //{submitted}
 						/>
 						<span>{choice}</span>
 					</label>
@@ -140,6 +172,34 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 				</p>
 				<p className="mb-4">{currentQuestion.title}</p>
 				{renderChoices()}
+				{submitted && currentQuestion.answer === answers[currentQuestion.id] ? (
+					<div className="border p-4 rounded-md">
+						<p className="font-semibold mb-2">
+							Correct Answer: {currentQuestion.points}/{currentQuestion.points}
+						</p>
+					</div>
+				) : (
+					submitted && (
+						<div className="border p-4 rounded-md">
+							<p className="font-semibold mb-2">
+								Incorect Answer: 0/{currentQuestion.points}
+							</p>
+							<p className="mb-4">
+								The Correct Answer is: {currentQuestion.answer}
+							</p>
+						</div>
+					)
+				)}
+				{submitted && (
+					<div className="border p-4 rounded-md">
+						<p className="mb-4">
+							Correct Answers: {correctAnswers}/{questions.length}
+						</p>
+						<p className="font-semibold mb-2">
+							Total Points Earned: {earnedPoints}/{totalPoints}
+						</p>
+					</div>
+				)}
 			</div>
 
 			<div className="flex justify-between">
@@ -151,7 +211,7 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 				>
 					← Back
 				</button>
-				{!submitted && isLastQuestion ? (
+				{isLastQuestion ? ( //!submitted &&
 					<button
 						type="button"
 						onClick={handleSubmit}
