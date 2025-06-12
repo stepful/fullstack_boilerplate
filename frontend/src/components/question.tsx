@@ -7,11 +7,11 @@ import {
 	TableHeader,
 	TableRow,
 } from "@/components/ui/table";
+import { scoresBaseUrl } from "@/paths";
 import { useEffect, useState } from "react";
 
 function QuestionItem({ question }: { question: Question }) {
 	const [selectedChoice, setSelectedChoice] = useState<string | null>(null);
-	const [openEndedAnswer, setOpenEndedAnswer] = useState<string>("");
 
 	const choices = question.choices
 		? question.choices.split(";;").map((choice) => choice.trim())
@@ -39,14 +39,7 @@ function QuestionItem({ question }: { question: Question }) {
 					</ul>
 				) : (
 					<div className="flex flex-col space-y-2">
-						<em>Open-ended</em>
-						<textarea
-							value={openEndedAnswer}
-							onChange={(e) => setOpenEndedAnswer(e.target.value)}
-							placeholder="Type your answer here..."
-							className="w-full p-2 border border-gray-300 rounded-md"
-							rows={3}
-						/>
+						<em>Question Error</em>
 					</div>
 				)}
 			</TableCell>
@@ -56,7 +49,7 @@ function QuestionItem({ question }: { question: Question }) {
 
 export function QuizStepper({ questions }: { questions: Question[] }) {
 	// Unique key based on quiz ID to persist progress per quiz
-	const quizKey = `quiz-progress-${questions[0]?.id}`;
+	const quizKey = `quiz-progress-${questions[0]?.assignment_id}`;
 
 	const [currentIndex, setCurrentIndex] = useState(0);
 	const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -72,6 +65,7 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 	// Load from localStorage once on mount
 	useEffect(() => {
 		const saved = localStorage.getItem(quizKey);
+		// console.log(localStorage, saved, quizKey);
 		if (saved) {
 			try {
 				const parsed = JSON.parse(saved);
@@ -90,7 +84,7 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 
 	// Save to localStorage on state change *after* initial load
 	useEffect(() => {
-		if (!hasHydrated) return; //  skip initial render
+		if (!hasHydrated && localStorage.getItem(quizKey) != null) return; //  skip initial render
 
 		const data = {
 			currentIndex,
@@ -101,6 +95,7 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 			correctAnswers,
 		};
 		localStorage.setItem(quizKey, JSON.stringify(data));
+		// console.log("lMaybe reseting", localStorage, quizKey);
 	}, [
 		currentIndex,
 		answers,
@@ -130,6 +125,32 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 				correctAnswersCount++;
 			}
 		}
+
+		const user_id = 1; // Replace with real user ID
+		const assignment_id = questions[0]?.assignment_id;
+
+		fetch(scoresBaseUrl(), {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				assignment_id,
+				user_id,
+				score: points,
+			}),
+		})
+			.then((res) => {
+				if (!res.ok) throw new Error("Failed to save score");
+				return res.json();
+			})
+			.then((data) => {
+				console.log("Score submitted successfully:", data);
+			})
+			.catch((err) => {
+				console.error("Error submitting score:", err);
+			});
+
 		setEarnedPoints(points);
 		setTotalPoints(totalPoints);
 		setCorrectAnswers(correctAnswersCount);
@@ -155,7 +176,7 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 							value={choice}
 							checked={selected === choice}
 							onChange={() => handleChoiceChange(choice)}
-							disabled={false} //{submitted}
+							disabled={submitted}
 						/>
 						<span>{choice}</span>
 					</label>
@@ -211,7 +232,7 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 				>
 					← Back
 				</button>
-				{isLastQuestion ? ( //!submitted &&
+				{!submitted && isLastQuestion ? ( //!submitted &&
 					<button
 						type="button"
 						onClick={handleSubmit}
@@ -223,7 +244,8 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 					<button
 						type="button"
 						onClick={() => setCurrentIndex((i) => i + 1)}
-						className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+						className="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50"
+						disabled={isLastQuestion}
 					>
 						Next →
 					</button>
@@ -235,6 +257,7 @@ export function QuizStepper({ questions }: { questions: Question[] }) {
 
 export type Question = {
 	id: number;
+	assignment_id: number;
 	title: string;
 	choices: string;
 	answer: string;
